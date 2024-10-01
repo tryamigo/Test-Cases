@@ -1,255 +1,207 @@
+// This file contains Playwright test scripts for testing various functionalities of the Client Management system.
+// It covers login, client addition, client interaction, client group management, and communication options in multiple scenarios.
+
 import { test, expect } from "@playwright/test";
 
+// Test suite for Client Management functionality
 test.describe("Client Management", () => {
+  // Executed before each test in this suite to log in and navigate to the clients page
   test.beforeEach(async ({ page }) => {
-    await page.goto("/sign-in");
-    // Fill in login details
-    await page.fill("input#email", "testuser@example5.com"); // Use the same email as registered
-    await page.fill("input#password", "password123");
-
-    // Submit the login form
-    await page.click('button[type="submit"]');
-
-    // Expect successful login
-    await expect(page).toHaveURL("/"); // Adjust this to the expected URL after login
-    await expect(page.locator("text=Clients")).toBeVisible(); // Adjust to the appropriate
-    // Navigate to the clients page
-    await page.goto("/clients");
+    await page.goto("/sign-in"); // Navigate to the sign-in page
+    await page.fill("input#email", "testuser@example5.com"); // Input the email address
+    await page.fill("input#password", "password123"); // Input the password
+    await page.click('button[type="submit"]'); // Click the submit button to log in
+    await expect(page).toHaveURL("/"); // Verify the correct URL after login
+    await expect(page.locator("text=Clients")).toBeVisible(); // Verify that the Clients section is visible
+    await page.goto("/clients"); // Navigate to the clients page
   });
 
   test("Add a new client with valid information", async ({ page }) => {
-    await page.click('button:has-text("ADD NEW CLIENT")');
-    await page.fill("input#name", "John Doe");
-    await page.fill("input#email", "john.doe@example.com");
-    await page.fill("input#mobile", "1234567890");
-    await page.fill("input#whatsapp", "1234567890");
-    await page.click('button:has-text("Add Client")');
-
-    await expect(page.locator("text=John Doe")).toBeVisible();
+    // Test to add a new client with valid details
+    await page.click('button:has-text("ADD NEW CLIENT")'); // Click the button to add a new client
+    await page.fill("input#name", "John Doe"); // Fill in the client's name
+    await page.fill("input#email", "john.doe@example.com"); // Fill in the client's email
+    await page.fill("input#mobile", "1234567890"); // Fill in the client's mobile number
+    await page.fill("input#whatsapp", "1234567890"); // Fill in the client's WhatsApp number
+    await page.click('button:has-text("Add Client")'); // Click to add the client
+    await expect(page.locator("text=John Doe")).toBeVisible(); // Verify that the new client is displayed
   });
 
   test("Add a client with missing required fields", async ({ page }) => {
-    await page.click('button:has-text("ADD NEW CLIENT")');
-    // Don't fill in any fields
-    await page.click('button:has-text("Add Client")');
-
-    await expect(page.locator("text=Name is required")).toBeVisible();
+    // Test to verify that client addition fails when required fields are missing
+    await page.click('button:has-text("ADD NEW CLIENT")'); // Click the button to add a new client
+    await page.click('button:has-text("Add Client")'); // Click to add the client without filling any fields
+    await expect(page.locator("text=Name is required")).toBeVisible(); // Verify the error message for missing name
   });
 
   test("Add a client with invalid field", async ({ page }) => {
-    await page.click('button:has-text("ADD NEW CLIENT")');
-    await page.fill("input#name", "Jane Doe");
-    await page.fill("input#email", "invalid-email");
-    await page.click('button:has-text("Add Client")');
-
-    await expect(
-      page.locator("text=Error adding client to database")
-    ).toBeVisible();
+    // Test to verify error handling when an invalid email is provided
+    await page.click('button:has-text("ADD NEW CLIENT")'); // Click the button to add a new client
+    await page.fill("input#name", "Jane Doe"); // Fill in the client's name
+    await page.fill("input#email", "invalid-email"); // Fill in an invalid email
+    await page.click('button:has-text("Add Client")'); // Click to add the client
+    await expect(page.locator("text=Error adding client to database")).toBeVisible(); // Verify the error message
   });
 });
 
+// Test suite for verifying Client List View functionality
 test.describe("Client List View", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/sign-in");
-    // Fill in login details
-    await page.fill("input#email", "testuser@example5.com"); // Use the same email as registered
+    await page.goto("/sign-in"); // Log in and navigate to the clients page
+    await page.fill("input#email", "testuser@example5.com");
     await page.fill("input#password", "password123");
-
-    // Submit the login form
     await page.click('button[type="submit"]');
-
-    // Expect successful login
-    await expect(page).toHaveURL("/"); // Adjust this to the expected URL after login
-    await expect(page.locator("text=Clients")).toBeVisible(); // Adjust to the appropriate
-    // Navigate to the clients page
+    await expect(page).toHaveURL("/");
+    await expect(page.locator("text=Clients")).toBeVisible();
     await page.goto("/clients");
   });
-  test("Verify all added clients are displayed", async ({ page }) => {
-    const clientNames = "John Doe";
 
-    await expect(page.locator(`text=${clientNames}`)).toBeVisible();
+  test("Verify all added clients are displayed", async ({ page }) => {
+    // Verify that a specific client (John Doe) is displayed in the client list
+    await expect(page.locator("text=John Doe")).toBeVisible(); // Verify the presence of John Doe in the client list
   });
 
   test("Test the search functionality", async ({ page }) => {
-    await page.fill('input[placeholder="Search Clients"]', "John");
-    await expect(page.locator("text=John Doe")).toBeVisible();
+    // Test the search feature for clients
+    await page.fill('input[placeholder="Search Clients"]', "John"); // Search for "John"
+    await expect(page.locator("text=John Doe")).toBeVisible(); // Verify that John Doe is displayed in search results
   });
 });
 
+// Test suite for verifying Individual Client Page functionality
 test.describe("Individual Client Page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/sign-in");
-    // Fill in login details
-    await page.fill("input#email", "testuser@example5.com"); // Use the same email as registered
+    await page.goto("/sign-in"); // Log in and navigate to the clients page
+    await page.fill("input#email", "testuser@example5.com");
     await page.fill("input#password", "password123");
-
-    // Submit the login form
     await page.click('button[type="submit"]');
-
-    // Expect successful login
-    await expect(page).toHaveURL("/"); // Adjust this to the expected URL after login
-    await expect(page.locator("text=Clients")).toBeVisible(); // Adjust to the appropriate
-    // Navigate to the clients page
+    await expect(page).toHaveURL("/");
+    await expect(page.locator("text=Clients")).toBeVisible();
     await page.goto("/clients");
   });
 
   test("Navigate to a specific client's page", async ({ page }) => {
-    await page.click("text=John Doe");
-    await expect(page.locator("text=Client Info")).toBeVisible();
+    // Test navigation to an individual client's page
+    await page.click("text=John Doe"); // Click on "John Doe" to navigate to their details page
+    await expect(page.locator("text=Client Info")).toBeVisible(); // Verify that the client info is visible
   });
 
   test("Edit client details", async ({ page }) => {
-    await page.click("text=John Doe");
-    await page.click("text=Options");
-    await page.click("text=Edit Contact Details");
-    await page.fill("input#email", "newemail@test123.com");
-    await page.click('button:has-text("Save")');
-    await expect(page.locator("text=newemail@test123.com")).toBeVisible();
+    // Test editing a client's details
+    await page.click("text=John Doe"); // Open John Doe's client page
+    await page.click("text=Options"); // Click on "Options" to open the edit menu
+    await page.click("text=Edit Contact Details"); // Select "Edit Contact Details"
+    await page.fill("input#email", "newemail@test123.com"); // Update the client's email
+    await page.click('button:has-text("Save")'); // Save changes
+    await expect(page.locator("text=newemail@test123.com")).toBeVisible(); // Verify the updated email is visible
   });
 
   test("Change client status", async ({ page }) => {
-    await page.click("text=John Doe");
-    await expect(page).toHaveURL(/.*clients\/.*/);
-    await expect(page.locator("text=contacted")).toBeVisible();
-    await page.click("text=contacted");
-    await page.click("text=Qualified");
-    await expect(page.locator("text=Qualified")).toBeVisible();
+    // Test changing the client's status
+    await page.click("text=John Doe"); // Open John Doe's client page
+    await expect(page).toHaveURL(/.*clients\/.*/); // Verify the URL
+    await expect(page.locator("text=contacted")).toBeVisible(); // Verify "contacted" status is visible
+    await page.click("text=contacted"); // Click to change status
+    await page.click("text=Qualified"); // Change status to "Qualified"
+    await expect(page.locator("text=Qualified")).toBeVisible(); // Verify the new status is visible
   });
 
   test("Set follow-up date", async ({ page }) => {
-    await page.click("text=John Doe");
+    // Test setting a follow-up date for a client
+    await page.click("text=John Doe"); // Open John Doe's client page
     await expect(page).toHaveURL(/.*clients\/.*/);
-
-    // Check for the "No follow up" text initially
-    // await expect(page.locator('text= No follow up Scheduled')).toBeVisible();
-    await expect(page.locator("text= Follow Up:")).toBeVisible();
-
-    // // Schedule a follow-up date
-    //  await page.click('text= No follow up Scheduled');
-    await page.click("text= Follow Up:");
-
-    await page.click("text=13");
-    await page.click("text=Apply");
-
-    // Now the text should be "Follow Up" instead of "No follow up"
-    await expect(page.locator("text= Follow Up: 13 Oct")).toBeVisible();
+    await expect(page.locator("text=Follow Up:")).toBeVisible(); // Verify "Follow Up:" is visible
+    await page.click("text=Follow Up:"); // Click to set a follow-up date
+    await page.click("text=13"); // Select the 13th of the month
+    await page.click("text=Apply"); // Apply the follow-up date
+    await expect(page.locator("text= Follow Up: 13 Oct")).toBeVisible(); // Verify the new follow-up date
   });
 });
 
+// Test suite for verifying Communication Options functionality
 test.describe("Communication Options", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/sign-in");
-    // Fill in login details
-    await page.fill("input#email", "testuser@example5.com"); // Use the same email as registered
+    await page.goto("/sign-in"); // Log in and navigate to the clients page
+    await page.fill("input#email", "testuser@example5.com");
     await page.fill("input#password", "password123");
-
-    // Submit the login form
     await page.click('button[type="submit"]');
-
-    // Expect successful login
-    await expect(page).toHaveURL("/"); // Adjust this to the expected URL after login
-    await expect(page.locator("text=Clients")).toBeVisible(); // Adjust to the appropriate
-    // Navigate to the clients page
+    await expect(page).toHaveURL("/");
+    await expect(page.locator("text=Clients")).toBeVisible();
     await page.goto("/clients");
   });
 
-  /*  */
   test("Add activity to timeline", async ({ page }) => {
-    await page.click("text=John Doe");
-    await expect(page).toHaveURL(/.*clients\/.*/);
-
-    await page.click("text=Add Activity");
-
-    await page.selectOption('select:near(:text("Activity Type"))', "Meeting");
-
+    // Test adding an activity to a client's timeline
+    await page.click("text=John Doe"); // Open John Doe's client page
+    await page.click("text=Add Activity"); // Click to add an activity
+    await page.selectOption('select:near(:text("Activity Type"))', "Meeting"); // Select "Meeting" as activity type
     await page.fill(
       'textarea:near(:text("Description"))',
       "Client meeting to discuss project details"
-    );
-    
-    
-    
-    await page.click('text=Add Activity')
-    // Verify that the new activity appears in the timeline
-    await expect(page.locator("text=Meeting")).toBeVisible();
+    ); // Fill in activity description
+    await page.click("text=Add Activity"); // Click to add the activity
+    await expect(page.locator("text=Meeting")).toBeVisible(); // Verify the activity type is displayed
     await expect(
       page.locator("text=Client meeting to discuss project details")
-    ).toBeVisible();
+    ).toBeVisible(); // Verify the activity description is displayed
   });
 
   test("Verify communication icons are clickable", async ({ page }) => {
-    await page.click("text=John Doe");
-    await expect(page.locator('a[href^="tel:"]')).toBeVisible();
-    await expect(page.locator('a[href^="https://wa.me/"]')).toBeVisible();
-    await expect(page.locator('a[href^="mailto:"]')).toBeVisible();
+    // Test that the communication icons (phone, WhatsApp, email) are clickable
+    await page.click("text=John Doe"); // Open John Doe's client page
+    await expect(page.locator('a[href^="tel:"]')).toBeVisible(); // Verify that the phone link is visible
+    await expect(page.locator('a[href^="https://wa.me/"]')).toBeVisible(); // Verify that the WhatsApp link is visible
+    await expect(page.locator('a[href^="mailto:"]')).toBeVisible(); // Verify that the email link is visible
   });
 });
 
+// Test suite for verifying Client Grouping functionality
 test.describe("Client Grouping", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/sign-in");
-    // Fill in login details
-    await page.fill("input#email", "testuser@example5.com"); // Use the same email as registered
+    await page.goto("/sign-in"); // Log in and navigate to the clients page
+    await page.fill("input#email", "testuser@example5.com");
     await page.fill("input#password", "password123");
-
-    // Submit the login form
     await page.click('button[type="submit"]');
-
-    // Expect successful login
-    await expect(page).toHaveURL("/"); // Adjust this to the expected URL after login
-    await expect(page.locator("text=Clients")).toBeVisible(); // Adjust to the appropriate
-    // Navigate to the clients page
+    await expect(page).toHaveURL("/");
+    await expect(page.locator("text=Clients")).toBeVisible();
     await page.goto("/clients");
   });
+
   test("Add client to a group", async ({ page }) => {
-    // Click on client name to open the details
-    await page.click("text=John Doe");
-    await page.waitForSelector("text=Click to add groups", {
-      state: "visible",
-    }); // Wait for the "Click to add groups" link
-
-    // Click to add groups
-    await page.click("text=Click to add groups");
-
-    // Wait for and click "create new group"
-    await page.waitForSelector("text=create new group", { state: "visible" });
-    await page.click("text=create new group");
-
-    await page.fill("input#groupName", "VIP Clients");
-    await page.click("text=Create Group");
-
-    // Verify that the group was added (e.g., check for "VIP Clients")
+    // Test adding a client to a group
+    await page.click("text=John Doe"); // Open John Doe's client page
+    await page.waitForSelector("text=Click to add groups", { state: "visible" }); // Wait for the group link to be visible
+    await page.click("text=Click to add groups"); // Click to add groups
+    await page.waitForSelector("text=create new group", { state: "visible" }); // Wait for the "create new group" link
+    await page.click("text=create new group"); // Click to create a new group
+    await page.fill("input#groupName", "VIP Clients"); // Fill in the group name
+    await page.click("text=Create Group"); // Create the group
     await page.waitForSelector("text=VIP Clients", { state: "visible" }); // Wait for the group to be displayed
-    await expect(page.locator("text=VIP Clients")).toBeVisible();
+    await expect(page.locator("text=VIP Clients")).toBeVisible(); // Verify that the group is displayed
   });
 });
 
+// Test suite for verifying Client Notes functionality
 test.describe("Client Notes", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/sign-in");
-    // Fill in login details
-    await page.fill("input#email", "testuser@example5.com"); // Use the same email as registered
+    await page.goto("/sign-in"); // Log in and navigate to the clients page
+    await page.fill("input#email", "testuser@example5.com");
     await page.fill("input#password", "password123");
-
-    // Submit the login form
     await page.click('button[type="submit"]');
-
-    // Expect successful login
-    await expect(page).toHaveURL("/"); // Adjust this to the expected URL after login
-    await expect(page.locator("text=Clients")).toBeVisible(); // Adjust to the appropriate
-    // Navigate to the clients page
+    await expect(page).toHaveURL("/");
+    await expect(page.locator("text=Clients")).toBeVisible();
     await page.goto("/clients");
   });
 
   test("Add and verify note", async ({ page }) => {
-    await page.click("text=John Doe");
-    await expect(page).toHaveURL(/.*clients\/.*/);
-    await page.click("text=Options");
-    await page.click("text=Edit Client Notes");
-    await page.fill("textarea.w-full", "This is a test note");
-    await page.click('button:has-text("Save")');
+    // Test adding a note to a client
+    await page.click("text=John Doe"); // Open John Doe's client page
+    await page.click("text=Options"); // Click on "Options"
+    await page.click("text=Edit Client Notes"); // Select "Edit Client Notes"
+    await page.fill("textarea.w-full", "This is a test note"); // Fill in the note
+    await page.click('button:has-text("Save")'); // Save the note
     await expect(
       page.locator("p").filter({ hasText: "This is a test note" })
-    ).toBeVisible();
+    ).toBeVisible(); // Verify the note is displayed
   });
 });
