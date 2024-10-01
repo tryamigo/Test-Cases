@@ -15,8 +15,32 @@ Before getting started, ensure you have the following installed:
 
 To install Playwright and set up the project, follow these steps:
 
-1. **Clone the Repository**:
+##Important Note
+
+The tests folder must be present in the root folder of your application, and it must contain the playwright.config.ts file.
+This is crucial for Playwright to properly locate and execute your test files with the correct configuration settings.
+
+1. **Clone the Repository and install modules**:
 
    ```sh
    git clone https://github.com/your-username/your-repository.git
-  cd your-repository
+   npm install
+
+2. **Install Playwright**:
+
+   ```sh
+   npx playwright install
+
+3. **Run Playwright**:
+
+   ```sh
+   npx playwright test
+
+4. **For Particular file**:
+
+   ```sh
+   npx playwright test path/to/your-test-file.spec.ts
+5. **For accessing the UI of playwright**:
+
+   ```sh
+   npx playwright test --ui
