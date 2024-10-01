@@ -1,0 +1,13 @@
+
+Folder and File Structure in the Root Directory
+Assuming you want to have test files structured in a specific way for your app's Playwright tests, your directory layout should look like this:
+
+```sh 
+/my-app-root-directory
+  ├── /tests                          # Folder to store all end-to-end (E2E) tests
+  │     ├── credentials-auth.spec.ts  # Playwright test for  authentication
+  │     └── client.spec.ts            # Playwright test for client
+  ├── package.json                    # Node.js dependencies and scripts
+  ├── playwright.config.ts            # Configuration file for Playwright
+  └── /src                            # Your application's source code
+
